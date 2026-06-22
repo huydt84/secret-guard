@@ -1,0 +1,17 @@
+Found 2 potential secret(s):
+
+[1] OpenAI API Key (high)
+    Detector: openai-api-key
+    Confidence: high
+    Location: test.env:1:1
+    Preview: sk-t...3456
+    Fingerprint: sha256:a1b2c3d4e5f6
+    Context: OPENAI_API_KEY="[REDACTED]"
+
+[2] GitHub Token (medium)
+    Detector: github-token
+    Confidence: medium
+    Location: config.yml:5:10
+    Preview: ghp_...7890
+    Fingerprint: sha256:b2c3d4e5f6a7
+
