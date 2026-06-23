@@ -10,6 +10,7 @@ import (
 	"github.com/huydinhtrong/secretguard/internal/finding"
 	"github.com/huydinhtrong/secretguard/internal/report"
 	"github.com/huydinhtrong/secretguard/internal/scanners/agents"
+	"github.com/huydinhtrong/secretguard/internal/scanners/docker"
 	"github.com/huydinhtrong/secretguard/internal/scanners/filesystem"
 	"github.com/huydinhtrong/secretguard/internal/scanners/git"
 
@@ -56,6 +57,13 @@ If no path is given, scans the current directory.`,
 		agentsFlag, _ := cmd.Flags().GetString("agents")
 		agentPath, _ := cmd.Flags().GetString("agent-path")
 
+		dockerMode, _ := cmd.Flags().GetBool("docker")
+		dockerfilePath, _ := cmd.Flags().GetString("dockerfile")
+		composePath, _ := cmd.Flags().GetString("compose")
+		containerID, _ := cmd.Flags().GetString("docker-container")
+		imageID, _ := cmd.Flags().GetString("docker-image")
+		dockerEnabled := dockerMode || dockerfilePath != "" || composePath != "" || containerID != "" || imageID != ""
+
 		findings := make([]finding.Finding, 0)
 
 		if gitEnabled {
@@ -89,6 +97,46 @@ If no path is given, scans the current directory.`,
 				return fmt.Errorf("agent scan: %w", err)
 			}
 			findings = agentFindings
+		} else if dockerEnabled {
+			dockerScanner := docker.New(det)
+
+			if dockerfilePath != "" {
+				fs, err := dockerScanner.ScanDockerfile(dockerfilePath)
+				if err != nil {
+					return fmt.Errorf("dockerfile scan: %w", err)
+				}
+				findings = append(findings, fs...)
+			}
+			if composePath != "" {
+				fs, err := dockerScanner.ScanCompose(composePath)
+				if err != nil {
+					return fmt.Errorf("compose scan: %w", err)
+				}
+				findings = append(findings, fs...)
+			}
+			if containerID != "" {
+				fs, err := dockerScanner.ScanContainer(containerID)
+				if err != nil {
+					_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "Warning: docker container scan:", err)
+				} else {
+					findings = append(findings, fs...)
+				}
+			}
+			if imageID != "" {
+				fs, err := dockerScanner.ScanImage(imageID)
+				if err != nil {
+					_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "Warning: docker image scan:", err)
+				} else {
+					findings = append(findings, fs...)
+				}
+			}
+			if dockerMode {
+				fs, err := dockerScanner.ScanDocker(cmd.Context(), path)
+				if err != nil {
+					return fmt.Errorf("docker scan: %w", err)
+				}
+				findings = append(findings, fs...)
+			}
 		} else {
 			maxFileSize, _ := cmd.Flags().GetInt64("max-file-size")
 			scanner := filesystem.New(det, filesystem.WithMaxFileSize(maxFileSize))
@@ -137,7 +185,11 @@ func init() {
 	scanCmd.Flags().Bool("include-untracked", false, "Include untracked files in git working tree scan")
 	scanCmd.Flags().String("agents", "", "Comma-separated agent types (codex,opencode,copilot)")
 	scanCmd.Flags().String("agent-path", "", "Path to agent session file")
-	scanCmd.Flags().Bool("docker", false, "Scan Docker metadata")
+	scanCmd.Flags().Bool("docker", false, "Scan Docker metadata (Dockerfile, compose)")
+	scanCmd.Flags().String("dockerfile", "", "Scan a specific Dockerfile")
+	scanCmd.Flags().String("compose", "", "Scan a specific docker-compose file")
+	scanCmd.Flags().String("docker-container", "", "Scan a container via docker inspect")
+	scanCmd.Flags().String("docker-image", "", "Scan an image via docker history")
 	scanCmd.Flags().Bool("include-vscode-storage", false, "Include VS Code storage in Copilot scan (disabled by default)")
 	scanCmd.Flags().String("format", "terminal", "Output format (terminal, json)")
 	scanCmd.Flags().Int64("max-file-size", filesystem.DefaultMaxFileSize, "Maximum file size in bytes to scan")
