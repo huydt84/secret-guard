@@ -6,8 +6,3 @@ AGENTS.md
 .DS_Store
 skills-lock.json
 bin/
-testdata/*
-!testdata/golden/
-!testdata/agents/
-!testdata/redact/
-!testdata/docker/
