@@ -20,7 +20,7 @@ func NewImageScanner(image string, det *detector.Detector) *ImageScanner {
 
 func (s *ImageScanner) Scan() ([]finding.Finding, error) {
 	if !dockerAvailable() {
-		return nil, fmt.Errorf("Docker daemon unavailable — cannot inspect image %s", s.image)
+		return nil, fmt.Errorf("docker daemon unavailable — cannot inspect image %s", s.image)
 	}
 
 	out, err := exec.Command("docker", "history", "--no-trunc", s.image).Output()

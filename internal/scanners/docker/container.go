@@ -40,7 +40,7 @@ type containerInspect struct {
 
 func (s *ContainerScanner) Scan() ([]finding.Finding, error) {
 	if !dockerAvailable() {
-		return nil, fmt.Errorf("Docker daemon unavailable — cannot inspect container %s", s.container)
+		return nil, fmt.Errorf("docker daemon unavailable — cannot inspect container %s", s.container)
 	}
 
 	out, err := exec.Command("docker", "inspect", s.container).Output()

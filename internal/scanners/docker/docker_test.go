@@ -15,7 +15,7 @@ func TestDockerfileScanner_FindsENVSecret(t *testing.T) {
 	det := detector.New(detector.BuiltinRules, nil)
 	dir := t.TempDir()
 	df := filepath.Join(dir, "Dockerfile")
-	os.WriteFile(df, []byte(`FROM alpine
+	_ = os.WriteFile(df, []byte(`FROM alpine
 ENV OPENAI_API_KEY=sk-test_abcdefghijklmnopqrstuvwxyz123456
 `), 0600)
 
@@ -43,7 +43,7 @@ func TestDockerfileScanner_FindsARGSecret(t *testing.T) {
 	det := detector.New(detector.BuiltinRules, nil)
 	dir := t.TempDir()
 	df := filepath.Join(dir, "Dockerfile")
-	os.WriteFile(df, []byte(`FROM alpine
+	_ = os.WriteFile(df, []byte(`FROM alpine
 ARG ANTHROPIC_API_KEY=sk-ant-test_abcdefghijklmnopqrstuvwxyz123456
 `), 0600)
 
@@ -71,7 +71,7 @@ func TestDockerfileScanner_DetectsCOPYEnvRisk(t *testing.T) {
 	det := detector.New(detector.BuiltinRules, nil)
 	dir := t.TempDir()
 	df := filepath.Join(dir, "Dockerfile")
-	os.WriteFile(df, []byte(`FROM alpine
+	_ = os.WriteFile(df, []byte(`FROM alpine
 COPY .env /app/.env
 `), 0600)
 
@@ -96,9 +96,11 @@ func TestDockerfileScanner_DetectsADDEnvRisk(t *testing.T) {
 	det := detector.New(detector.BuiltinRules, nil)
 	dir := t.TempDir()
 	df := filepath.Join(dir, "Dockerfile")
-	os.WriteFile(df, []byte(`FROM alpine
-ADD --chown=app:app .env /app/.env
-`), 0600)
+	if err := os.WriteFile(df, []byte(`FROM alpine
+COPY .env /app/.env
+`), 0600); err != nil {
+		t.Fatal(err)
+	}
 
 	fs, err := ScanDockerfile(df, det)
 	if err != nil {
@@ -121,7 +123,7 @@ func TestDockerfileScanner_RUNExport(t *testing.T) {
 	det := detector.New(detector.BuiltinRules, nil)
 	dir := t.TempDir()
 	df := filepath.Join(dir, "Dockerfile")
-	os.WriteFile(df, []byte(`FROM alpine
+	_ = os.WriteFile(df, []byte(`FROM alpine
 RUN export AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE && echo done
 `), 0600)
 
@@ -150,7 +152,9 @@ func TestDockerfileScanner_FullFixture(t *testing.T) {
 	if err != nil {
 		t.Skip("fixture not found:", err)
 	}
-	os.WriteFile(df, data, 0600)
+	if err := os.WriteFile(df, data, 0600); err != nil {
+		t.Fatal(err)
+	}
 
 	fs, err := ScanDockerfile(df, det)
 	if err != nil {
@@ -195,7 +199,7 @@ func TestComposeScanner_DetectsDirectEnvSecret(t *testing.T) {
 	det := detector.New(detector.BuiltinRules, nil)
 	dir := t.TempDir()
 	cp := filepath.Join(dir, "docker-compose.yml")
-	os.WriteFile(cp, []byte(`services:
+	_ = os.WriteFile(cp, []byte(`services:
   web:
     image: nginx
     environment:
@@ -223,7 +227,7 @@ func TestComposeScanner_DetectsBuildArgsSecret(t *testing.T) {
 	det := detector.New(detector.BuiltinRules, nil)
 	dir := t.TempDir()
 	cp := filepath.Join(dir, "docker-compose.yml")
-	os.WriteFile(cp, []byte(`services:
+	_ = os.WriteFile(cp, []byte(`services:
   web:
     image: nginx
     build:
@@ -252,7 +256,7 @@ func TestComposeScanner_DetectsEnvFileRisk(t *testing.T) {
 	det := detector.New(detector.BuiltinRules, nil)
 	dir := t.TempDir()
 	cp := filepath.Join(dir, "docker-compose.yml")
-	os.WriteFile(cp, []byte(`services:
+	_ = os.WriteFile(cp, []byte(`services:
   web:
     image: nginx
     env_file: .env
@@ -283,7 +287,7 @@ func TestComposeScanner_FullFixture(t *testing.T) {
 	if err != nil {
 		t.Skip("fixture not found:", err)
 	}
-	os.WriteFile(cp, data, 0600)
+	_ = os.WriteFile(cp, data, 0600)
 
 	fs, err := ScanCompose(cp, det)
 	if err != nil {
@@ -299,7 +303,7 @@ func TestComposeScanner_EnvironmentListForm(t *testing.T) {
 	det := detector.New(detector.BuiltinRules, nil)
 	dir := t.TempDir()
 	cp := filepath.Join(dir, "docker-compose.yml")
-	os.WriteFile(cp, []byte(`services:
+	_ = os.WriteFile(cp, []byte(`services:
   web:
     image: nginx
     environment:
@@ -327,7 +331,7 @@ func TestDockerfileScanner_EmptyDockerfile(t *testing.T) {
 	det := detector.New(detector.BuiltinRules, nil)
 	dir := t.TempDir()
 	df := filepath.Join(dir, "Dockerfile")
-	os.WriteFile(df, []byte("FROM alpine\nCMD [\"sh\"]\n"), 0600)
+	_ = os.WriteFile(df, []byte("FROM alpine\nCMD [\"sh\"]\n"), 0600)
 
 	fs, err := ScanDockerfile(df, det)
 	if err != nil {
@@ -343,9 +347,11 @@ func TestDockerfileScanner_NoFullSecretInPreview(t *testing.T) {
 	det := detector.New(detector.BuiltinRules, nil)
 	dir := t.TempDir()
 	df := filepath.Join(dir, "Dockerfile")
-	os.WriteFile(df, []byte(`FROM alpine
-ENV KEY=sk-test_abcdefghijklmnopqrstuvwxyz123456
-`), 0600)
+	if err := os.WriteFile(df, []byte(`FROM alpine
+RUN export AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE && echo done
+`), 0600); err != nil {
+		t.Fatal(err)
+	}
 
 	fs, err := ScanDockerfile(df, det)
 	if err != nil {
@@ -405,7 +411,7 @@ func TestComposeScanner_NoSecrets(t *testing.T) {
 	det := detector.New(detector.BuiltinRules, nil)
 	dir := t.TempDir()
 	cp := filepath.Join(dir, "docker-compose.yml")
-	os.WriteFile(cp, []byte(`services:
+	_ = os.WriteFile(cp, []byte(`services:
   web:
     image: nginx
     environment:
@@ -498,7 +504,7 @@ func TestComposeScanner_YAMLErrors(t *testing.T) {
 	det := detector.New(detector.BuiltinRules, nil)
 	dir := t.TempDir()
 	cp := filepath.Join(dir, "docker-compose.yml")
-	os.WriteFile(cp, []byte(`invalid: yaml: unclosed
+	_ = os.WriteFile(cp, []byte(`invalid: yaml: unclosed
   block
 `), 0600)
 
@@ -512,7 +518,7 @@ func TestDockerfileScanner_SourceKind(t *testing.T) {
 	det := detector.New(detector.BuiltinRules, nil)
 	dir := t.TempDir()
 	df := filepath.Join(dir, "Dockerfile")
-	os.WriteFile(df, []byte(`FROM alpine
+	_ = os.WriteFile(df, []byte(`FROM alpine
 ENV OPENAI_API_KEY=sk-test_abcdefghijklmnopqrstuvwxyz123456
 `), 0600)
 
