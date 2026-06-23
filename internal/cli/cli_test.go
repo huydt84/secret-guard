@@ -2,6 +2,8 @@ package cli
 
 import (
 	"bytes"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -52,6 +54,7 @@ If no path is given, scans the current directory.`,
 			cmd.Flags().Bool("docker", false, "Scan Docker metadata")
 			cmd.Flags().String("format", "terminal", "Output format (terminal, json)")
 			cmd.Flags().Int64("max-file-size", 10485760, "Maximum file size in bytes")
+			cmd.Flags().Bool("include-vscode-storage", false, "Include VS Code storage in Copilot scan")
 			return cmd
 		}(),
 		&cobra.Command{
@@ -86,6 +89,23 @@ func execCmd(args ...string) (string, error) {
 	cmd.SetArgs(args)
 	err := cmd.Execute()
 	return buf.String(), err
+}
+
+func projectRoot() string {
+	dir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			panic("project root not found")
+		}
+		dir = parent
+	}
 }
 
 func TestVersion(t *testing.T) {
@@ -182,5 +202,19 @@ func TestRemediateNoArgs(t *testing.T) {
 	_, err := execCmd("remediate")
 	if err == nil {
 		t.Fatal("expected error for remediate without args")
+	}
+}
+
+func TestScanAgentsExplicitPath(t *testing.T) {
+	buf := new(bytes.Buffer)
+	rootCmd.SetOut(buf)
+	rootCmd.SetErr(buf)
+	rootCmd.SetArgs([]string{"scan", "--agents", "all", "--agent-path", filepath.Join(projectRoot(), "testdata", "agents"), "--format", "json"})
+
+	if err := rootCmd.Execute(); err != nil {
+		t.Fatalf("scan agents failed: %v\nout: %s", err, buf.String())
+	}
+	if strings.Contains(buf.String(), "sk-test_abcdefghijklmnopqrstuvwxyz123456") {
+		t.Fatalf("full secret leaked in report: %s", buf.String())
 	}
 }

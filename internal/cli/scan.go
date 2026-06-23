@@ -1,12 +1,15 @@
 package cli
 
 import (
+	"context"
 	"fmt"
+	"strings"
 
 	"github.com/huydinhtrong/secretguard/internal/config"
 	"github.com/huydinhtrong/secretguard/internal/detector"
 	"github.com/huydinhtrong/secretguard/internal/finding"
 	"github.com/huydinhtrong/secretguard/internal/report"
+	"github.com/huydinhtrong/secretguard/internal/scanners/agents"
 	"github.com/huydinhtrong/secretguard/internal/scanners/filesystem"
 	"github.com/huydinhtrong/secretguard/internal/scanners/git"
 
@@ -50,6 +53,9 @@ If no path is given, scans the current directory.`,
 		gitHistory, _ := cmd.Flags().GetBool("git-history")
 		gitEnabled := gitMode || gitStaged || gitHistory
 
+		agentsFlag, _ := cmd.Flags().GetString("agents")
+		agentPath, _ := cmd.Flags().GetString("agent-path")
+
 		findings := make([]finding.Finding, 0)
 
 		if gitEnabled {
@@ -76,6 +82,13 @@ If no path is given, scans the current directory.`,
 				}
 				findings = append(findings, fs...)
 			}
+		} else if agentsFlag != "" {
+			includeVSCodeStorage, _ := cmd.Flags().GetBool("include-vscode-storage")
+			agentFindings, err := scanAgents(cmd.Context(), det, agentsFlag, agentPath, includeVSCodeStorage)
+			if err != nil {
+				return fmt.Errorf("agent scan: %w", err)
+			}
+			findings = agentFindings
 		} else {
 			maxFileSize, _ := cmd.Flags().GetInt64("max-file-size")
 			scanner := filesystem.New(det, filesystem.WithMaxFileSize(maxFileSize))
@@ -98,11 +111,13 @@ If no path is given, scans the current directory.`,
 		}
 
 		failOn := cfg.Report.FailOn
-		if cliFailOn, _ := cmd.Flags().GetString("fail-on"); cliFailOn != "" {
+		cliFailOn, _ := cmd.Flags().GetString("fail-on")
+		if cliFailOn != "" {
 			failOn = cliFailOn
 		}
 
-		if failOn != "" {
+		skipDefaultFailOn := agentsFlag != "" && cliFailOn == ""
+		if failOn != "" && !skipDefaultFailOn {
 			count := countFindingsAtOrAbove(findings, failOn)
 			if count > 0 {
 				return fmt.Errorf("found %d finding(s) at or above %s severity", count, failOn)
@@ -123,9 +138,63 @@ func init() {
 	scanCmd.Flags().String("agents", "", "Comma-separated agent types (codex,opencode,copilot)")
 	scanCmd.Flags().String("agent-path", "", "Path to agent session file")
 	scanCmd.Flags().Bool("docker", false, "Scan Docker metadata")
+	scanCmd.Flags().Bool("include-vscode-storage", false, "Include VS Code storage in Copilot scan (disabled by default)")
 	scanCmd.Flags().String("format", "terminal", "Output format (terminal, json)")
 	scanCmd.Flags().Int64("max-file-size", filesystem.DefaultMaxFileSize, "Maximum file size in bytes to scan")
 	scanCmd.Flags().String("fail-on", "", "Exit non-zero if findings at or above severity (low, medium, high, critical)")
+}
+
+func scanAgents(ctx context.Context, det *detector.Detector, agentsFlag, agentPath string, includeVSCodeStorage bool) ([]finding.Finding, error) {
+	var scanners []agents.AgentScanner
+
+	switch agentsFlag {
+	case "all":
+		scanners = []agents.AgentScanner{
+			agents.CodexScanner{},
+			agents.OpenCodeScanner{},
+			agents.CopilotScanner{IncludeVSCodeStorage: includeVSCodeStorage},
+		}
+	default:
+		for _, name := range strings.Split(agentsFlag, ",") {
+			name = strings.TrimSpace(name)
+			switch name {
+			case "codex":
+				scanners = append(scanners, agents.CodexScanner{})
+			case "opencode":
+				scanners = append(scanners, agents.OpenCodeScanner{})
+			case "copilot":
+				scanners = append(scanners, agents.CopilotScanner{IncludeVSCodeStorage: includeVSCodeStorage})
+			default:
+				return nil, fmt.Errorf("unknown agent: %s", name)
+			}
+		}
+	}
+
+	var allFindings []finding.Finding
+
+	for _, s := range scanners {
+		if agentPath != "" {
+			findings, err := s.ScanPath(ctx, agentPath, det)
+			if err != nil {
+				return nil, fmt.Errorf("%s scan: %w", s.Name(), err)
+			}
+			allFindings = append(allFindings, findings...)
+		} else {
+			paths, err := s.DiscoverPaths(ctx)
+			if err != nil {
+				continue
+			}
+			for _, p := range paths {
+				findings, err := s.ScanPath(ctx, p.Path, det)
+				if err != nil {
+					continue
+				}
+				allFindings = append(allFindings, findings...)
+			}
+		}
+	}
+
+	return allFindings, nil
 }
 
 func countFindingsAtOrAbove(findings []finding.Finding, severity string) int {
