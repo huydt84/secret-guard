@@ -1,0 +1,22 @@
+Remediation plan for finding sg-finding-agent-006
+  Secret kind: Anthropic API Key
+  Severity:    high
+  Preview:     sk-an...3456
+  Fingerprint: sha256:ff66
+
+Steps:
+
+  1. Run SecretGuard redaction on agent data
+     Use the redact command with --dry-run first to review what will be redacted. Then apply with --apply to perform the redaction.
+     $ secretguard redact --agents <agent-type> --dry-run
+
+  2. Apply redaction after review
+     Once the dry-run output looks correct, apply the redaction in-place. SecretGuard will create a backup before modifying files.
+     $ secretguard redact --agents <agent-type> --apply
+
+  3. Rotate or revoke the credential
+     If this credential is known to be valid and has been exposed outside the local environment, rotate or revoke it at the provider immediately.
+
+  ⚠ Always review the dry-run output before applying redaction.
+
+  ⚠ Backups are created automatically when --apply is used. Use `secretguard restore --backup-id <id>` to revert if needed.

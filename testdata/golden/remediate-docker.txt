@@ -1,0 +1,25 @@
+Remediation plan for finding sg-finding-docker-env-002
+  Secret kind: OpenAI API Key
+  Severity:    high
+  Preview:     sk-t...3456
+  Fingerprint: sha256:bbccddeeff22
+
+Steps:
+
+  1. Remove the secret from Dockerfile ENV
+     ENV instructions bake secrets into the image layer. Any user with image access can retrieve them via `docker history` or `docker inspect`.
+     $ Remove the ENV line containing the secret from the Dockerfile.
+
+  2. Use build-time secrets instead
+     Pass secrets at build time using `docker build --secret`. The secret is available in the build context but not persisted in the image.
+     $ docker build --secret id=mysecret,src=./mysecret.txt -t myimage .
+
+  3. Use a local env file with restricted permissions
+     Store secrets in a .env file (chmod 600) and load them in the container at runtime. Ensure the .env file is in .dockerignore.
+     $ echo SECRET=value > .env && chmod 600 .env
+
+  ⚠ Do not delete containers or images based on this plan alone — always coordinate with the team first.
+
+  ⚠ After rotating credentials, rebuild and redeploy any affected images or containers.
+
+  ⚠ Review all CI/CD pipelines that might have access to the exposed credential.

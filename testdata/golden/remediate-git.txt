@@ -1,0 +1,36 @@
+Remediation plan for finding sg-finding-git-001
+  Secret kind: GitHub Token
+  Severity:    high
+  Preview:     ghp_...7890
+  Fingerprint: sha256:aabbccddee11
+
+Steps:
+
+  1. Rotate or revoke the credential immediately
+     Before rewriting history, ensure the compromised credential is rotated or revoked at the provider. This limits the window of exposure even if the history rewrite is delayed.
+
+  2. Create a fresh mirror clone
+     Clone a bare mirror of the repository to work on. This preserves all refs and avoids affecting the working directory.
+     $ git clone --mirror <repository-url> repo-mirror
+
+  3. Prepare a replacement text file
+     Create a replacement text file for git filter-repo. List the secret pattern without including the raw secret in the output.
+     $ echo 'ghp_* => [REVOKED]' > /tmp/replacements.txt
+
+  4. Run git filter-repo manually
+     Execute git filter-repo in the mirror clone directory. The --replace-text option will replace all occurrences of the replacement patterns across the entire history.
+     $ cd repo-mirror && git filter-repo --force --replace-text /tmp/replacements.txt
+
+  5. Re-scan the rewritten history
+     After the rewrite, run SecretGuard on the mirror clone to verify no secrets remain in the history.
+     $ secretguard scan repo-mirror --git-history --format json
+
+  6. Force-push only after team coordination
+     Rewriting history requires everyone to rebase onto the new history. Coordinate with the team before force-pushing. All local clones will need to be re-cloned or rebased.
+     $ cd repo-mirror && git push --force --mirror origin
+
+  ⚠ Do not execute git filter-repo on the original clone — work on the mirror only.
+
+  ⚠ Force-pushing a rewritten branch will break all open pull requests and local clones.
+
+  ⚠ Ensure all team members have rebased before force-pushing.
