@@ -1,0 +1,12 @@
+{
+  "version": "1.0",
+  "sessions": [
+    {
+      "id": "session-1",
+      "messages": [
+        {"role": "user", "content": "Show me the AWS configuration"},
+        {"role": "assistant", "content": "Here is the key: AKIAIOSFODNN7EXAMPLE"}
+      ]
+    }
+  ]
+}

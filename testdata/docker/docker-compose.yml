@@ -1,0 +1,22 @@
+services:
+  web:
+    image: nginx:latest
+    environment:
+      - DATABASE_URL=postgres://user:supersecretpassword@localhost:5432/app
+      - NODE_ENV=production
+    env_file: .env
+    build:
+      args:
+        GITHUB_TOKEN: ghp_abcdefghijklmnopqrstuvwxyz1234567890
+    labels:
+      com.example.token: "npm_test-token-with-secret-value"
+    command:
+      - sh
+      - -c
+      - echo $DATABASE_URL
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://user:supersecret@localhost:8080/health

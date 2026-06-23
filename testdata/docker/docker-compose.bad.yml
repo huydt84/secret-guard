@@ -1,0 +1,9 @@
+services:
+  web:
+    image: nginx:latest
+    environment:
+      - OPENAI_API_KEY=sk-test_abcdefghijklmnopqrstuvwxyz123456
+    env_file: .env
+    build:
+      args:
+        NPM_TOKEN: npm_abcdefghijklmnopqrstuvwxyz123456

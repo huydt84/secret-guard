@@ -1,0 +1,3 @@
+Chat session with user
+User asked about API key
+Assistant provided key: sk-test_abcdefghijklmnopqrstuvwxyz123456

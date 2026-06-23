@@ -1,0 +1,2 @@
+{"type":"session","id":"1","messages":[{"role":"user","content":"How do I set up the API?"},{"role":"assistant","content":"Use key sk-test_abcdefghijklmnopqrstuvwxyz123456"}]}
+{"type":"session","id":"2","messages":[{"role":"user","content":"Configure database connection"},{"role":"assistant","content":"Connection string: postgres://app:secret123@localhost:5432/db"}]}
