@@ -7,3 +7,4 @@ AGENTS.md
 skills-lock.json
 bin/
 testdata/
+!testdata/golden/
