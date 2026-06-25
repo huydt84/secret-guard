@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/huydinhtrong/secretguard/internal/detector"
-	"github.com/huydinhtrong/secretguard/internal/finding"
+	"github.com/huydt84/secret-guard/internal/detector"
+	"github.com/huydt84/secret-guard/internal/finding"
 	"gopkg.in/yaml.v3"
 )
 
@@ -25,17 +25,17 @@ type composeFile struct {
 }
 
 type composeService struct {
-	Environment any                    `yaml:"environment"`
-	EnvFile     string                 `yaml:"env_file"`
-	Build       *composeBuild          `yaml:"build"`
-	Labels      map[string]string      `yaml:"labels"`
-	Command     any                    `yaml:"command"`
-	Entrypoint  any                    `yaml:"entrypoint"`
-	Healthcheck *composeHealthcheck    `yaml:"healthcheck"`
+	Environment any                 `yaml:"environment"`
+	EnvFile     string              `yaml:"env_file"`
+	Build       *composeBuild       `yaml:"build"`
+	Labels      map[string]string   `yaml:"labels"`
+	Command     any                 `yaml:"command"`
+	Entrypoint  any                 `yaml:"entrypoint"`
+	Healthcheck *composeHealthcheck `yaml:"healthcheck"`
 }
 
 type composeBuild struct {
-	Args     map[string]string `yaml:"args"`
+	Args map[string]string `yaml:"args"`
 }
 
 type composeHealthcheck struct {

@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/huydinhtrong/secretguard/internal/config"
-	"github.com/huydinhtrong/secretguard/internal/detector"
-	"github.com/huydinhtrong/secretguard/internal/redact"
-	"github.com/huydinhtrong/secretguard/internal/scanners/agents"
+	"github.com/huydt84/secret-guard/internal/config"
+	"github.com/huydt84/secret-guard/internal/detector"
+	"github.com/huydt84/secret-guard/internal/redact"
+	"github.com/huydt84/secret-guard/internal/scanners/agents"
 
 	"github.com/spf13/cobra"
 )

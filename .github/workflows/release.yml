@@ -9,30 +9,25 @@ permissions:
   contents: write
 
 jobs:
-  goreleaser:
+  release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
 
-      - name: Make build script executable
-        run: chmod +x scripts/build.sh
+      - name: Run tests
+        run: |
+          go test ./...
+          go vet ./...
 
-      - name: Extract version from tag
-        id: version
-        run: echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
-
-      - name: Build binaries
-        run: make release
+      - name: Release with GoReleaser
+        uses: goreleaser/goreleaser-action@v6
         env:
-          VERSION: ${{ steps.version.outputs.version }}
-
-      - name: Create release
-        uses: softprops/action-gh-release@v2
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: secretguard ${{ steps.version.outputs.version }}
-          files: |
-            bin/secretguard-*
-          generate_release_notes: true
+          version: latest
+          args: release --clean

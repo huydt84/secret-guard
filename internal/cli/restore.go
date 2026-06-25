@@ -3,7 +3,7 @@ package cli
 import (
 	"fmt"
 
-	"github.com/huydinhtrong/secretguard/internal/redact"
+	"github.com/huydt84/secret-guard/internal/redact"
 	"github.com/spf13/cobra"
 )
 

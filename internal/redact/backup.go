@@ -10,13 +10,13 @@ import (
 )
 
 type Backup struct {
-	ID           string `json:"backup_id"`
-	CreatedAt    string `json:"created_at"`
-	OriginalPath string `json:"original_path"`
-	BackupPath   string `json:"backup_path"`
-	SHA256Before string `json:"sha256_before"`
-	SHA256After  string `json:"sha256_after,omitempty"`
-	FindingsCount int   `json:"findings_redacted"`
+	ID            string `json:"backup_id"`
+	CreatedAt     string `json:"created_at"`
+	OriginalPath  string `json:"original_path"`
+	BackupPath    string `json:"backup_path"`
+	SHA256Before  string `json:"sha256_before"`
+	SHA256After   string `json:"sha256_after,omitempty"`
+	FindingsCount int    `json:"findings_redacted"`
 }
 
 type BackupManager struct {

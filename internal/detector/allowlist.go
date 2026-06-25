@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/huydinhtrong/secretguard/internal/finding"
+	"github.com/huydt84/secret-guard/internal/finding"
 )
 
 type Allowlist struct {

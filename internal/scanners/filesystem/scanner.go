@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/huydinhtrong/secretguard/internal/detector"
-	"github.com/huydinhtrong/secretguard/internal/finding"
+	"github.com/huydt84/secret-guard/internal/detector"
+	"github.com/huydt84/secret-guard/internal/finding"
 )
 
 const DefaultMaxFileSize int64 = 10 * 1024 * 1024 // 10 MB

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/huydinhtrong/secretguard/internal/detector"
+	"github.com/huydt84/secret-guard/internal/detector"
 )
 
 func projectRoot() string {

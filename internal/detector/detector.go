@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/huydinhtrong/secretguard/internal/finding"
+	"github.com/huydt84/secret-guard/internal/finding"
 )
 
 type findingConfidence = finding.Confidence
@@ -22,8 +22,8 @@ type Detector struct {
 	allowlist *Allowlist
 }
 
-func (d *Detector) Rules() []Rule           { return d.rules }
-func (d *Detector) Allowlist() *Allowlist   { return d.allowlist }
+func (d *Detector) Rules() []Rule         { return d.rules }
+func (d *Detector) Allowlist() *Allowlist { return d.allowlist }
 
 func New(rules []Rule, allowlist *Allowlist) *Detector {
 	return &Detector{

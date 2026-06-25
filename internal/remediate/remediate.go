@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/huydinhtrong/secretguard/internal/finding"
+	"github.com/huydt84/secret-guard/internal/finding"
 )
 
 type Step struct {
@@ -15,15 +15,15 @@ type Step struct {
 }
 
 type RemediationPlan struct {
-	FindingID   string            `json:"finding_id"`
+	FindingID   string             `json:"finding_id"`
 	Source      finding.SourceKind `json:"source"`
-	DetectorID  string            `json:"detector_id"`
-	SecretKind  string            `json:"secret_kind"`
-	Severity    string            `json:"severity"`
-	Preview     string            `json:"preview"`
-	Fingerprint string            `json:"fingerprint"`
-	Steps       []Step            `json:"steps"`
-	Warnings    []string          `json:"warnings,omitempty"`
+	DetectorID  string             `json:"detector_id"`
+	SecretKind  string             `json:"secret_kind"`
+	Severity    string             `json:"severity"`
+	Preview     string             `json:"preview"`
+	Fingerprint string             `json:"fingerprint"`
+	Steps       []Step             `json:"steps"`
+	Warnings    []string           `json:"warnings,omitempty"`
 }
 
 func LookupFinding(reportPath, findingID string) (finding.Finding, error) {

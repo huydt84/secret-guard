@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/huydinhtrong/secretguard/internal/finding"
+	"github.com/huydt84/secret-guard/internal/finding"
 )
 
 func TestBuiltinRules_OpenAI(t *testing.T) {

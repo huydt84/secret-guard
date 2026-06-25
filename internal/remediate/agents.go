@@ -1,7 +1,7 @@
 package remediate
 
 import (
-	"github.com/huydinhtrong/secretguard/internal/finding"
+	"github.com/huydt84/secret-guard/internal/finding"
 )
 
 func GenerateAgentAdvice(f finding.Finding) RemediationPlan {

@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/huydinhtrong/secretguard/internal/config"
-	"github.com/huydinhtrong/secretguard/internal/detector"
-	"github.com/huydinhtrong/secretguard/internal/finding"
-	"github.com/huydinhtrong/secretguard/internal/report"
-	"github.com/huydinhtrong/secretguard/internal/scanners/agents"
-	"github.com/huydinhtrong/secretguard/internal/scanners/docker"
-	"github.com/huydinhtrong/secretguard/internal/scanners/filesystem"
-	"github.com/huydinhtrong/secretguard/internal/scanners/git"
+	"github.com/huydt84/secret-guard/internal/config"
+	"github.com/huydt84/secret-guard/internal/detector"
+	"github.com/huydt84/secret-guard/internal/finding"
+	"github.com/huydt84/secret-guard/internal/report"
+	"github.com/huydt84/secret-guard/internal/scanners/agents"
+	"github.com/huydt84/secret-guard/internal/scanners/docker"
+	"github.com/huydt84/secret-guard/internal/scanners/filesystem"
+	"github.com/huydt84/secret-guard/internal/scanners/git"
 
 	"github.com/spf13/cobra"
 )

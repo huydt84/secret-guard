@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/huydinhtrong/secretguard/internal/detector"
-	"github.com/huydinhtrong/secretguard/internal/finding"
+	"github.com/huydt84/secret-guard/internal/detector"
+	"github.com/huydt84/secret-guard/internal/finding"
 )
 
 func TestMarker(t *testing.T) {

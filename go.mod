@@ -1,4 +1,4 @@
-module github.com/huydinhtrong/secretguard
+module github.com/huydt84/secret-guard
 
 go 1.26.4
 

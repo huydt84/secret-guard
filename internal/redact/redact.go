@@ -9,8 +9,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/huydinhtrong/secretguard/internal/detector"
-	"github.com/huydinhtrong/secretguard/internal/finding"
+	"github.com/huydt84/secret-guard/internal/detector"
+	"github.com/huydt84/secret-guard/internal/finding"
 )
 
 var binaryExts = map[string]bool{
@@ -28,9 +28,9 @@ func Marker(secretKind, fingerprint string) string {
 }
 
 type matchInterval struct {
-	start, end int
-	value      string
-	secretKind string
+	start, end  int
+	value       string
+	secretKind  string
 	fingerprint string
 	finding     finding.Finding
 }

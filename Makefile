@@ -1,7 +1,6 @@
 .PHONY: test vet build release install-hook
 
 APP     := secretguard
-VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 
 test:
 	go test ./... -v
@@ -13,7 +12,7 @@ build:
 	go build -o bin/$(APP) ./cmd/$(APP)
 
 release:
-	VERSION=$(VERSION) OUTDIR=./bin ./scripts/build.sh
+	goreleaser release --snapshot --clean
 
 install-hook:
 	go build -o bin/$(APP) ./cmd/$(APP)

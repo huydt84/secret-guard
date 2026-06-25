@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/huydinhtrong/secretguard/internal/config"
+	"github.com/huydt84/secret-guard/internal/config"
 	"github.com/spf13/cobra"
 )
 

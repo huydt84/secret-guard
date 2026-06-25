@@ -8,18 +8,35 @@ Local-first CLI for detecting and safely remediating secret leaks in code, git h
 
 ## Installation
 
+### Quick install macOS/Linux
+
+```bash
+# Latest release
+curl -fsSL https://raw.githubusercontent.com/huydt84/secret-guard/main/install.sh | sh
+# Specific release
+VERSION=v0.1.1 curl -fsSL https://raw.githubusercontent.com/huydt84/secret-guard/main/install.sh | sh
+```
+
+### Manual install
+
+1. Download archive for your OS/arch from [Releases](https://github.com/huydt84/secret-guard/releases).
+2. Extract archive.
+3. Move `secretguard` into PATH.
+
+```bash
+tar -xzf secretguard_0.1.1_darwin_arm64.tar.gz
+chmod +x secretguard
+sudo mv secretguard /usr/local/bin/
+secretguard --help
+```
+
 ### From source
 
 ```bash
-git clone https://github.com/huydinhtrong/secretguard.git
-cd secretguard
-make build
-./bin/secretguard version
+go install github.com/huydt84/secret-guard/cmd/secretguard@latest
 ```
 
-### Pre-built binaries
-
-Download from [Releases](https://github.com/huydinhtrong/secretguard/releases).
+Verify checksums with `sha256sum -c checksums.txt` or `shasum -a 256 -c checksums.txt`.
 
 ## Quick start
 

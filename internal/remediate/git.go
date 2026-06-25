@@ -3,7 +3,7 @@ package remediate
 import (
 	"fmt"
 
-	"github.com/huydinhtrong/secretguard/internal/finding"
+	"github.com/huydt84/secret-guard/internal/finding"
 )
 
 func GenerateGitPlan(f finding.Finding) RemediationPlan {

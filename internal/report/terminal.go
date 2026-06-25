@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/huydinhtrong/secretguard/internal/finding"
+	"github.com/huydt84/secret-guard/internal/finding"
 )
 
 func WriteTerminal(w io.Writer, findings []finding.Finding, showPreview, showFingerprints bool) {
