@@ -20,6 +20,56 @@ need() {
   }
 }
 
+profile_path() {
+  shell_name=${SHELL##*/}
+
+  case "$shell_name" in
+    zsh)
+      printf '%s' "${ZDOTDIR:-${HOME}}/.zshrc"
+      ;;
+    bash)
+      if [ -f "${HOME}/.bashrc" ] || [ ! -f "${HOME}/.bash_profile" ]; then
+        printf '%s' "${HOME}/.bashrc"
+      else
+        printf '%s' "${HOME}/.bash_profile"
+      fi
+      ;;
+    *)
+      printf '%s' "${HOME}/.profile"
+      ;;
+  esac
+}
+
+ensure_path() {
+  install_dir=$1
+
+  case ":${PATH}:" in
+    *:"$install_dir":*)
+      return 0
+      ;;
+  esac
+
+  profile=$(profile_path)
+  path_line="export PATH=\"${install_dir}:\$PATH\""
+
+  mkdir -p "$(dirname "$profile")"
+  touch "$profile"
+
+  if grep -Fqs "$path_line" "$profile"; then
+    err "${install_dir} already configured in ${profile}"
+    err "Open new shell or run: . \"${profile}\""
+    return 0
+  fi
+
+  {
+    printf '\n# Added by SecretGuard installer\n'
+    printf '%s\n' "$path_line"
+  } >> "$profile"
+
+  err "Added ${install_dir} to PATH in ${profile}"
+  err "Open new shell or run: . \"${profile}\""
+}
+
 os_name() {
   case "$(uname -s)" in
     Darwin) printf '%s' darwin ;;
@@ -53,6 +103,7 @@ release_tag() {
 
 main() {
   need curl
+  need grep
   need tar
 
   os=$(os_name)
@@ -77,13 +128,7 @@ main() {
   tar -xzf "$tmp_archive" -C "$tmpdir"
   install -m 0755 "$tmpdir/${APP}" "$install_dir/${APP}"
 
-  case ":${PATH}:" in
-    *:"$install_dir":*) ;;
-    *)
-      err "Installed to ${install_dir}, but dir is not on PATH"
-      err "Add: export PATH=\"${install_dir}:$PATH\""
-      ;;
-  esac
+  ensure_path "$install_dir"
 
   printf 'Installed %s %s to %s/%s\n' "$APP" "$tag" "$install_dir" "$APP"
 }

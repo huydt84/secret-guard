@@ -17,6 +17,8 @@ curl -fsSL https://raw.githubusercontent.com/huydt84/secret-guard/main/install.s
 VERSION=v0.1.0 curl -fsSL https://raw.githubusercontent.com/huydt84/secret-guard/main/install.sh | sh
 ```
 
+Installer puts `secretguard` in `~/.local/bin` by default and updates your shell profile if that directory is not already on `PATH`. Open a new shell, or run the `source` command printed by the installer, before using `secretguard` in the current session.
+
 ### Manual install
 
 1. Download archive for your OS/arch from [Releases](https://github.com/huydt84/secret-guard/releases).
