@@ -14,7 +14,7 @@ Local-first CLI for detecting and safely remediating secret leaks in code, git h
 # Latest release
 curl -fsSL https://raw.githubusercontent.com/huydt84/secret-guard/main/install.sh | sh
 # Specific release
-VERSION=v0.1.1 curl -fsSL https://raw.githubusercontent.com/huydt84/secret-guard/main/install.sh | sh
+VERSION=v0.1.0 curl -fsSL https://raw.githubusercontent.com/huydt84/secret-guard/main/install.sh | sh
 ```
 
 ### Manual install
@@ -24,7 +24,7 @@ VERSION=v0.1.1 curl -fsSL https://raw.githubusercontent.com/huydt84/secret-guard
 3. Move `secretguard` into PATH.
 
 ```bash
-tar -xzf secretguard_0.1.1_darwin_arm64.tar.gz
+tar -xzf secretguard-darwin-arm64.tar.gz
 chmod +x secretguard
 sudo mv secretguard /usr/local/bin/
 secretguard --help

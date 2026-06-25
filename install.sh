@@ -63,8 +63,7 @@ main() {
     exit 1
   fi
 
-  version=${tag#v}
-  archive="${APP}_${version}_${os}_${arch}.tar.gz"
+  archive="${APP}-${os}-${arch}.tar.gz"
   url="https://github.com/${OWNER}/${REPO}/releases/download/${tag}/${archive}"
   tmpdir=$(mktemp -d)
   trap 'rm -rf "$tmpdir"' EXIT INT TERM
